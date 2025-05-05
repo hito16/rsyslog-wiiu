@@ -1,0 +1,13 @@
+# original config script by GaryOderNicht
+# modified by hito16
+#
+# use to build the WiiU app
+#
+# % docker build -f Dockerfile.devkitppc -t devkitppc .
+# % docker run -it --rm -v ${PWD}:/project --hostname devkitppc --name devkitppc devkitppc /bin/bash
+#
+# root@devkitppc:/project# cd 7-rsyslog-test-app/; make
+
+FROM ghcr.io/wiiu-env/devkitppc:20241128
+
+WORKDIR /project

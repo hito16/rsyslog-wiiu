@@ -1,5 +1,9 @@
 ## Remote Syslog debugging
 
+A simple TCP remote logging solution, targetting WIIU homebrew development.
+
+* thanks to DanielKO and TurtleP for suggestion to implement TCP logging and pointers to redirecting stdout
+
 There are are two parts to this, 
 
 * Syslog Server 
@@ -9,7 +13,6 @@ There are are two parts to this,
    - simple libraries that write to rsyslogd over TCP.  Really this is just netcat
    - (optional) a simple UDP client libarary that sends a UDP broadcast, and captures the IP of the server response.
 
-![rsyslogd diagram](rsyslog-diag.png)
 
 ### Syslog Server
 
@@ -33,10 +36,10 @@ tail -f /var/log/remote/*
 If you change the ports, be sure to change the -p arguments and the rsyslogd.conf file
 
 A quick refresher on syslogd
+* built into linux as core service
 * multi client UDP / TCP support
-* simple clear text protocol
-* line oriented
-* Pretty UI integration
+* simple clear text, line oriented protocol
+* configurable output (no timestamps if you want)
 * log framework, with rotation, forwarding, aggregation, filtering
 
 ### Syslog Client
@@ -48,7 +51,7 @@ echo "<14>And I'd do it again" | nc  localhost 9514
 or 
 ```
 
-gcc -o test_rsyslogc rsyslog.c -I. test/test_rsyslog.c
+cd src; make
 ./test_rsyslog
 Sent to 127.0.0.1: <28> Apr 28 17:28:38 WIIU: This is a test message from my C program using TCP!
 Syslog message sent successfully!
@@ -58,6 +61,7 @@ Syslog message sent successfully!
 
 ```
 # server side
+docker exec -it rsyslogd-wiiu-9514 /bin/bash
 root@118c5c18fbbe:/# tail -f /var/log/remote/*
 2025-04-29T00:24:28.461614+00:00 Test Syslog message
 2025-04-29T00:25:08.556891+00:00 And I'd do it again
@@ -81,7 +85,38 @@ Option B: add the client library below.
 
 ### (optional)  udp client announce function
 
+How it works.
+1. WiiU app starts up and initiates a UDP Broadcast on 9515
+2. A small daemon running in the docker container receives the broadcast, and replies to the sender (WiiU app)
+3. WiiU app looks at the IP in the reponse.
+4. WiiU app configures the rsyslog client to send to the server IP
+
+The Docker container starts up with both services by default.
+
+![rsyslogd diagram](rsyslog-diag.png)
+
+
+In most cases, add the following to your homebrew.
+
+
 Add the following code to detect the IP address.  When called, the function will broadcast a UDP packet to servers listen on port 9515.  The client will read a response from the server, or timeout (currently 1 second).   
+
+```
+    // Typically you'd gate the intializatoin, like
+#ifdef DEBUG
+    if (init_rsyslogger() == 0) {
+
+    } else {
+      // setup UDP logging
+    }
+#endif
+... 
+    // then you can leave these stateents in place, and they'll output
+    // to your rsyslog service.
+    fprintf(stdout, "...");
+```
+
+For use outside the WiiU, call this.
 
 ```
 #include "announce.h"
@@ -96,7 +131,9 @@ Add the following code to detect the IP address.  When called, the function will
 
 ### (optional)  udp server acknowledge service
 
-A small 40 line service is configured to run in the docker instance.
+This is configured to run in the Docker config.  No addtional setup required.
+
+A small 40 line service is complied and launched on Docker startup.
 The service will recieve the UDP packet on port 9515, and respond with 
 a packet that contains it's IP.
 
@@ -106,4 +143,4 @@ Tiny, yet effective.  Just enough to provide the client a server IP without extr
 nohup udp_acknowledge_svc > /tmp/udp_acknowledge_svc.log
 ```
 
-This will die along with the syslog deamon when the Docker container shuts down.
+The service will die along with the syslog deamon when the Docker container shuts down.

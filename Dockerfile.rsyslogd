@@ -43,7 +43,7 @@ VOLUME /var/log/remote
 EXPOSE 9515/udp 
 RUN apt-get install -y gcc make
 
-COPY . /app/source/
+COPY src /app/source/
 # ---- files start: run_svcs.sh
 RUN cat <<EOF > /app/source/run_svcs.sh
 #!/bin/bash

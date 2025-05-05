@@ -9,8 +9,7 @@
 
 #define MAX_MSG_LEN 1024
 /* A fairly cookie cutter approach to writing to a remote syslogd over
-   TCP.  I feel like remote syslog forwarding should be available in an
-   aroma plugin.
+   TCP.  
 */
 int rsyslog_send_tcp(const char *syslog_server_ip, int port, int priority,
                      const char *message) {

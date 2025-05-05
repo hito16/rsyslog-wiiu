@@ -22,8 +22,10 @@ int main() {
     int priority = 6;  // debug
     const char *message = "1 This is a test message from my C program using TCP!";
 
+    printf("= Hardcoded IP test\n");
+    printf("Sending msg to hardcoded IP address %s\n", server_address);
     if (rsyslog_send_tcp(server_address, port, priority, message) == 0) {
-        printf("Syslog message 1 sent successfully to localhost!\n");
+        printf("Syslog message 1 sent successfully to %s\n", server_address);
     } else {
         perror("Failed to send syslog message.");
     }
@@ -32,12 +34,13 @@ int main() {
     priority = 7;  // debug
     message = "2 An error occurred in the application!";
     if (rsyslog_send_tcp(server_address, port, priority, message) == 0) {
-        printf("Syslog message 2 sent successfully to localhost!\n");
+        printf("Syslog message 2 sent successfully to %s\n", server_address);
     } else {
         perror("Failed to send syslog message.");
     }
+    printf("\n");
 
-    // Discover the IP
+    printf("= Discover IP test\n");
     char server_ip_buffer[17];
     int res = find_syslog_ip(server_ip_buffer);
     if (res == 0) {
