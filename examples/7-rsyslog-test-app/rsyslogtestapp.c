@@ -5,11 +5,6 @@ cable.
 
 As a middle ground, we add a rsyslog hook that redirects stdout  to a
 rsyslogd TCP server running in a supplied Docker container.
-
-  1. Per ../rsyslog/README.md, start the Dockerfile.rsyslogd and
-  2. wiiload <this file>.rpx
-  4. Per ./rsyslog/README.md, open a termial to the docker instance and tail the
-generated output.
  */
 
 #include <coreinit/thread.h>
@@ -22,9 +17,9 @@ generated output.
 
 // normally you only include rsyslog-wiiu.h,  call init_rsyslogger(),
 // then rely on printf()
-#include "rsyslog-wiiu.h"
+#include "rsyslog_pipe_wiiu.h"
 // but for this example, we want to show off rsyslog_send_tcp()
-#include "rsyslog.h"
+#include "rsyslog_client.h"
 
 /* Force a draw immediately after WHBLogPrintf
    Nothing will be written to the screen without WHBLogConsoleDraw
@@ -44,18 +39,8 @@ int main(int argc, char **argv)
     WHBLogConsoleDraw();
 #endif
 
-    /*  Initialize logging - find syslog ip address, and configure stdout redirection
-        Since this is meant for debugging, client will block until Syslog server is reached
-        Typically you'd gate logging, such as
-    #ifdef DEBUG
-        if (init_rsyslogger() == 0) {
-             ...
-        }
-    #endif
-       Once initialized, printf()'s will just go to your remote syslog.
-    */
 
-    if (init_rsyslogger() == 0)
+    if (init_rsyslog_redirect() == 0)
     {
         WHBLogPrintf("Discovered syslog IP %s", SYSLOG_IP);
         WHBLogConsoleDraw();

@@ -4,39 +4,19 @@
 #include <string.h>
 #include <sys/iosupport.h> // devoptab_list, devoptab_t
 
-#include "announce.h"
+#include "simple_discovery_protocol.h"
 #include "rsyslog_client.h"
 #include "rsyslog_pipe_wiiu.h"
 
-// Global variable definition
-
-
 char SYSLOG_IP[18];
 
-// Static instance of devoptab
 static devoptab_t devoptab;
-
-int find_syslog_ip(char *server_ip_buffer)
-{
-    int port = 9515;
-    int i = 0;
-    int res = -1;
-    for (int i = 0; i < 3; i++)
-    {
-        res = client_announce(server_ip_buffer, port);
-        if (res == 0)
-        {
-            return 0;
-        }
-    }
-    return res;
-}
 
 ssize_t write_msg_to_syslog(struct _reent *r, void *fd, const char *ptr,
                             size_t len)
 {
-    char buffer[1024];
-    snprintf(buffer, 1024, "%*.*s", len, len, ptr);
+    char buffer[SYSLOG_MESSAGE_MAX_LEN];
+    snprintf(buffer, SYSLOG_MESSAGE_MAX_LEN, "%*.*s", len, len, ptr);
     rsyslog_send_tcp(SYSLOG_IP, SYSLOG_MESSAGE_PORT, 14, buffer);
     return len;
 }
@@ -51,10 +31,10 @@ void init_stdout()
     devoptab_list[STD_ERR] = &devoptab;
 }
 
-int init_rsyslogger()
+int init_rsyslog_redirect()
 {
     char server_ip_buffer[18];
-    if (find_syslog_ip(server_ip_buffer) != 0)
+    if (discovery_get_ip_retry(server_ip_buffer) != 0)
     {
         return 1;
     }

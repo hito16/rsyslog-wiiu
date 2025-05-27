@@ -4,27 +4,29 @@ RUN apt-get update
 
 
 
-### BEGIN section daemon 1 : rsyslog,  port 9515 
+### BEGIN section rsyslog 
 # syslog ports
 EXPOSE 9514/udp 
 EXPOSE 9514/tcp
 RUN apt-get install -y rsyslog tzdata
 ENV TZ=America/Los_Angeles
 
-# The advantage is we see the firewall rules and the svc config in one place.
-# If you don't like self contained configs, feel free to break this up
-# and check in separate files.
 
 # ---- file start: rsyslog.conf
 RUN cat <<EOF > /tmp/rsyslog.conf
 # Minimal rsyslog configuration to receive remote logs on port 9514
-
+# provides UDP syslog reception
+#
 module(load="imudp")
 input(type="imudp" port="9514")
 
+# provides TCP syslog reception
 module(load="imtcp")
 input(type="imtcp" port="9514") 
 
+
+#\$template MyMessageLog, "/var/log/messages"
+# Log all received messages to a file, creating subdirectories based on the client IP
 \$template RemoteLogs,"/var/log/remote/%fromhost-ip%.log"
 *.* ?RemoteLogs
 EOF
@@ -36,7 +38,8 @@ RUN chown syslog:syslog /var/log/remote
 VOLUME /var/log/remote 
 
 
-### BEGIN section  daemon 2 : simple_discovery_svc, port 9515 
+
+### BEGIN section  simple_discovery_svc, port 9515 
 EXPOSE 9515/udp 
 RUN apt-get install -y gcc make
 

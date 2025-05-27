@@ -5,7 +5,7 @@
 
 extern char SYSLOG_IP[18];
 
-int init_rsyslogger();
+int init_rsyslog_redirect();
 
 #endif  // RSYSLOG_PIPE_WIIU
 #endif  // __WIIU__

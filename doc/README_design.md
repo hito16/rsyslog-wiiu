@@ -96,38 +96,7 @@ The Docker container starts up with both services by default.
 ![rsyslogd diagram](rsyslog-diag.png)
 
 
-In most cases, add the following to your homebrew.
 
-
-Add the following code to detect the IP address.  When called, the function will broadcast a UDP packet to servers listen on port 9515.  The client will read a response from the server, or timeout (currently 1 second).   
-
-```
-    // Typically you'd gate the intializatoin, like
-#ifdef DEBUG
-    if (init_rsyslogger() == 0) {
-
-    } else {
-      // setup UDP logging
-    }
-#endif
-... 
-    // then you can leave these stateents in place, and they'll output
-    // to your rsyslog service.
-    fprintf(stdout, "...");
-```
-
-For use outside the WiiU, call this.
-
-```
-#include "announce.h"
-
-    int port = 9515;   // the syslog server IP +1
-    char server_ip_buffer[17];
-    ... (add in a retry loop. currently read timeout = 1 second)
-    res = client_announce(server_ip_buffer, port);
-    printf("SERVER_IP=%s\n", server_ip_buffer);
-
-```
 
 ### (optional)  udp server acknowledge service
 
@@ -140,7 +109,7 @@ a packet that contains it's IP.
 Tiny, yet effective.  Just enough to provide the client a server IP without extra configuration steps.
 
 ```
-nohup udp_acknowledge_svc > /tmp/udp_acknowledge_svc.log
+nohup simple_discovery_service > /tmp/simple_discovery_service.log
 ```
 
 The service will die along with the syslog deamon when the Docker container shuts down.
