@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #define MAX_MSG_LEN 1024
+const int SYSLOG_MESSAGE_PORT = 9154;
 /* A fairly cookie cutter approach to writing to a remote syslogd over
    TCP.  
 */

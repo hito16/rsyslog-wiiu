@@ -1,12 +1,11 @@
 #ifdef __WIIU__
-#ifndef RSYSLOG_WIIU
-#define RSYSLOG_WIIU
+#ifndef RSYSLOG_PIPE_WIIU
+#define RSYSLOG_PIPE_WIIU
 
-//#include <stddef.h>
 
 extern char SYSLOG_IP[18];
 
 int init_rsyslogger();
 
-#endif  // RSYSLOG_WIIU
+#endif  // RSYSLOG_PIPE_WIIU
 #endif  // __WIIU__
