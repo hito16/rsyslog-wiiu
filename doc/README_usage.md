@@ -58,6 +58,8 @@ From the project root
 
 ### Using Discovery Service  Linux and MacOS
 
+The discovery service is run automatically in docker along with rsyslogd.  You don't need to build this, but if you're curious.
+
 ##### discover and send test message
 
 Window 1 start service
