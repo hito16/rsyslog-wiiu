@@ -7,6 +7,8 @@ A simple TCP remote logging solution, targetting WIIU homebrew development.
 
 ### Starting Syslog Server
 
+You view your logs by tailing syslog.  Syslog will run in a container on your desktop.
+
 ```
 # Build the docker container
 docker build -t rsyslogd-wiiu-9514 -f Dockerfile.rsyslogd  .
@@ -28,6 +30,8 @@ root@devkitppc:/project/rsyslog-wiiu#  make -f Makefile.wiiu.mk
 ...
 librsyslog_wiiu.a
 ```
+
+See examples directory and docs/README_usage.md for  usage
 
 ### Use in Makefiles (WiiU)
 
