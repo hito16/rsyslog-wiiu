@@ -1,3 +1,64 @@
+
+
+# building library first
+
+In the devkitppc docker instance or your configured WiiU development environment
+
+```
+root@devkitppc# cd /project/rsyslog-wiiu
+root@devkitppc# make -f Makefile.wiiu.mk
+...
+librsyslog_wiiu.a
+```
+
+# build the example
+
+```
+root@devkitppc# cd /project/rsyslog-wiiu/examples/7-rsyslog-test-app
+root@devkitppc# make
+linking ... rsyslog-test-app.elf
+built ... rsyslog-test-app.rpx
+Calculating metadata...
+Updating sibling and child entries...
+Populating data...
+Writing header...
+Writing /code/root.rpx...
+Writing /meta/meta.ini...
+Writing dir_hash_table...
+Writing dir_table...
+Writing file_hash_table...
+Writing file_table...
+built ... rsyslog-test-app.wuhb
+```
+
+# test
+
+## start syslog container in window 1
+
+```
+# Build the docker container
+docker build -t rsyslogd-wiiu-9514 -f Dockerfile.rsyslogd  .
+
+# Start the container in the background
+docker run -d --name rsyslogd-wiiu-9514 --hostname rsyslogd-wiiu-9514 -p 9514:9514/tcp -p 9514:9514/udp -p 9515:9515/udp -v rsyslogd-wiiu-9514:/var/log/remote rsyslogd-wiiu-9514
+
+# Browse / tail the remote log files 
+docker exec -it rsyslogd-wiiu-9514 /bin/bash
+
+tail -f /var/log/remote/*
+2025-04-29T00:24:28.461614+00:00 Test Syslog message
+```
+
+## wiiload the app in window 2
+
+```
+root@devkitppc# export WIILOAD=tcp:192.168.0.100
+root@devkitppc# wiiload rsyslog-test-app.wuhb
+```
+
+
+# historical notes
+
 The following are notes I took while learning the HB environment and tools.  Passing on to share 
 my experiences and motivation.
 

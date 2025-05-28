@@ -7,10 +7,10 @@ $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/de
 endif
 
 TOPDIR ?= $(CURDIR)
-SYSLOG_SERVER ?= "192.168.0.93"
 
 include $(DEVKITPRO)/wut/share/wut_rules
 
+# wherever you installed it
 RSYSLOG_ROOT := $(TOPDIR)/../../
 
 #-------------------------------------------------------------------------------
@@ -23,9 +23,9 @@ RSYSLOG_ROOT := $(TOPDIR)/../../
 
 TARGET		:=	rsyslog-test-app
 BUILD		:= 	build
-SOURCES		:=	. 
+SOURCES		:=	.
 
-INCLUDES	:=	$(RSYSLOG_ROOT)
+INCLUDES	:=	. $(RSYSLOG_ROOT)/include
 
 				
 #-------------------------------------------------------------------------------
@@ -35,8 +35,7 @@ INCLUDES	:=	$(RSYSLOG_ROOT)
 CFLAGS	:=	-O3 -ffunction-sections -fdata-sections \
 			$(MACHDEP)
 
-CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -DBIGENDIAN -DUSE_MBEDTLS \
-			-DSYSLOG_SERVER="\"$(SYSLOG_SERVER)\""
+CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -DBIGENDIAN -DUSE_MBEDTLS 
 
 CXXFLAGS	:= $(CFLAGS)
 
@@ -44,7 +43,7 @@ ASFLAGS	:=	$(ARCH)
 LDFLAGS	=	$(ARCH) $(RPXSPECS) -Wl,-Map,$(notdir $*.map)
 
 # You built librsyslog_wiiu.a per README.md, right?
-LIBS	:=  -lrsyslog_wiiu -lwut 
+LIBS	:=   -lrsyslog_wiiu -lwut
 
 
 #-------------------------------------------------------------------------------
@@ -60,7 +59,6 @@ LIBDIRS	:= $(PORTLIBS) $(WUT_ROOT) $(RSYSLOG_ROOT)
 #-------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #-------------------------------------------------------------------------------
-$(info SYSLOG_SERVER is $(SYSLOG_SERVER))
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
